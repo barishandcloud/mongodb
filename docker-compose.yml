@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  con1:
+    image: mongo
+    volumes:
+      - /mnt/fileshare/mongo/data1:/data/db
+    networks:
+      - overlay_net
+    ports:
+      - 27021:27017
+    links:
+      - con2
+      - con3
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    deploy:
+      placement:
+        constraints: [node.hostname == swarmvm1]
+  con2:
+    image: mongo
+    volumes:
+      - /mnt/fileshare/mongo/data2:/data/db
+    networks:
+      - overlay_net
+    ports:
+      - 27022:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    deploy:
+      placement:
+        constraints: [node.hostname == swarmvm2]    
+  con3:
+    image: mongo
+    volumes:
+      - /mnt/fileshare/mongo/data3:/data/db
+    networks:
+      - overlay_net
+    ports:
+      - 27023:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    deploy:
+      placement:
+        constraints: [node.hostname == swarmvm3]    
+
+networks:
+  overlay_net:
+    driver: overlay
