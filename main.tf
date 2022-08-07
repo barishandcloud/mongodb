@@ -175,6 +175,10 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   }
 }
 
+data "template_file" "script_run" {
+    template = file("docker-install.sh")
+}
+
 resource "azurerm_linux_virtual_machine" "vm2" {
   name                  = "swarmvm2"
   location              = azurerm_resource_group.rg.location
@@ -198,6 +202,8 @@ resource "azurerm_linux_virtual_machine" "vm2" {
   computer_name                   = "swarmvm2"
   admin_username                  = "azureuser"
   disable_password_authentication = true
+
+  custom_data = base64encode(data.template_file.script_run.rendered)
 
   admin_ssh_key {
     username   = "azureuser"
@@ -229,6 +235,8 @@ resource "azurerm_linux_virtual_machine" "vm3" {
   admin_username                  = "azureuser"
   disable_password_authentication = true
 
+  custom_data = base64encode(data.template_file.script_run.rendered)
+
   admin_ssh_key {
     username   = "azureuser"
     public_key = file("swarmvm.pub")
@@ -258,6 +266,8 @@ resource "azurerm_linux_virtual_machine" "vm4" {
   computer_name                   = "mongovm"
   admin_username                  = "azureuser"
   disable_password_authentication = true
+
+  custom_data = base64encode(data.template_file.script_run.rendered)
 
   admin_ssh_key {
     username   = "azureuser"
