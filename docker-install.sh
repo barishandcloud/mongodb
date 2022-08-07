@@ -8,7 +8,22 @@ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(
 apt update -y
 apt-cache policy docker-ce 
 apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y 
-usermod -aG docker ${USER}       
+usermod -aG docker ${vm_user_id}       
 echo "docker successfully installed"
 #docker_installation
+
+echo "Mounting file share on the vms"
+echo
+echo "Creating smbcreds dir"; mkdir -p /etc/smbcredentials
+echo
+echo "Creating smbcreds dir and populating vals"; echo "username=${sa_name}" >> /etc/smbcredentials/${sa_name}.cred
+ echo "password=${sa_key}" >> /etc/smbcredentials/${sa_name}.cred
+sudo chmod 600 /etc/smbcredentials/${sa_name}.cred
+echo
+echo "Creating file mount dir"; mkdir /mnt/swarmfileshare
+echo "fstab entry"; echo "//${sa_name}.file.core.windows.net/swarmfileshare /mnt/swarmfileshare cifs nofail,credentials=/etc/smbcredentials/${sa_name}.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30" >> /etc/fstab
+echo
+echo "mounting the file share"; mount -t cifs //${sa_name}.file.core.windows.net/swarmfileshare /mnt/swarmfileshare -o credentials=/etc/smbcredentials/${sa_name}.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30
+echo 
+echo "Operation complete"
 } | tee -a /tmp/logfile.txt

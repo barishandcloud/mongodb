@@ -1,0 +1,17 @@
+version: '3.5'
+services:
+  mongo:
+    image: mongo:4.0
+    deploy:
+      restart_policy:
+        condition: on-failure
+    entrypoint: [ "/usr/bin/mongod", "--dbpath=/data/db", "--bind_ip_all"]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: test123
+      MONGO_INITDB_DATABASE: test
+    ports:
+      - 27017:27017
+    volumes:
+      - /mnt/swarmfileshare/data/db:/data/db
+      - /mnt/swarmfileshare/data/backup:/data/backup
